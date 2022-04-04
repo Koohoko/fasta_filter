@@ -1,8 +1,8 @@
-### fasta_filter
+## fasta_filter
 
 This little tool accept a fasta file (or from stdin), and out put a filtered fasta file. It is (relatively) fast, see [comparison](#benchmark) between a simple python implementation.
 
-#### Usage:
+### Usage:
 ```
 fasta_filter 0.1.1
 Haogao Gu <koohoko@gmail.com>
@@ -44,7 +44,7 @@ OPTIONS:
             Print version information
 ```
 
-#### Examples
+### Examples
 **Example input:**
 ```
 >seq1_8N_5del
@@ -103,7 +103,7 @@ specified_num_base: 2
 TTTAAAAAAAAAAAAACCCCCCCCCCCTTTTTTTTGGGGGGGGGGGGGGGGAAACCC-----AAAAAANNNNNTTTTT
 ```
 
-#### Benchmark
+### Benchmark
 Runing on plain fasta file containing SASR-CoV-2 sequences (it is 1.5GB in file size, and contains 50,000 sequences (length of each sequence ~ 29900)). The rust implementation can be twice faster than the python3 one. I believe there is some space to further improve the performance, and I will try update it in later version.
 
 - For filter_fasta
@@ -151,11 +151,11 @@ Runing on plain fasta file containing SASR-CoV-2 sequences (it is 1.5GB in file 
             23801856  peak memory footprint
 ```
 
-
-#### TODO / PLANS
+### TODO / PLANS
 * [x] Test pipe streams. Stdin and Stdout work as expected.
 * [x] Test zip files. gz and xz inputs are also supported.
 * [x] Benchmark against python implementation.
+* [ ] Add installation instruction.
 * [ ] Improve performance.
 * [ ] Work in multithread mode?
 
