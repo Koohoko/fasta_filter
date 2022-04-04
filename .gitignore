@@ -1,4 +1,7 @@
-/target
-/data/*
-/python
+target/*
+!target/release/
+target/release/*
+!target/release/fasta_filter
+# /data/
+# /python
 benchmark.sh

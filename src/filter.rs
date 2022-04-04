@@ -1,81 +1,72 @@
-extern crate needletail;
-use needletail::{parse_fastx_stdin, parse_fastx_file, Sequence, FastxReader};
-use std::str;
-use std::{io, io::Write};
-use std::fs::File;
-use std::path::Path;
-use std::borrow::Cow;
+// extern crate needletail;
+use needletail::{Sequence};
+use std::{str, borrow::Cow};
+use crate::io::{get_writer, read_input, read_specified_pos};
 
-pub fn filter(file_path:&str, check_ipuac:bool, bases:Vec<char>, num_base:i32, out_file:&str) {
+pub fn filter(file_path:&str, bases_u8:Vec<u8>, num_base:u32, out_file:&str) {
 	let mut reader = read_input(file_path);
 	let mut writer = get_writer(out_file);
+	// print!("{:?}", bases_u8);
 
 	while let Some(record) = reader.next() {
-        let seqrec = record.expect("invalid record");	
-		let mut n_count = 0;
-		let mut seq:Cow<[u8]>;
-		if check_ipuac {
-			seq = seqrec.normalize(true);
-			n_count = count_n_base(&bases, seq);
-		} else{
-			seq = seqrec.normalize(false);
-			n_count = count_n_base(&bases, seq);
-		}
-		// TODO
+        let seqrec = record.expect("invalid record");
+		let seq = seqrec.strip_returns();
+		let n_count = count_n_base(&bases_u8, &seq);
+
 		if n_count <= num_base{
-			// println!("ID: {:?}", str::from_utf8(seqrec.id()).expect("can't get ID from utf8"));
-			// println!("num of N: {}", n_count);
 			seqrec.write(&mut writer, None).expect("write error");
 		}
     }
 }
 
-pub fn filter_specified(file_path:&str, check_ipuac:bool, bases:Vec<char>, num_base:i32, specified_pos_file:&str, specified_num_base:i32, out_file:&str) {
+pub fn filter_specified(file_path:&str, bases_u8:Vec<u8>, num_base:u32, specified_pos_file:&str, specified_num_base:u32, out_file:&str) {
 	let mut reader = read_input(file_path);
-	let writer = get_writer(out_file);
+	let mut writer = get_writer(out_file);
+	let mut_pos = read_specified_pos(specified_pos_file);
 
-	if num_base == 0{
-			
-	} else{
-		
-	}
-
-}
-
-fn read_input(file_path:&str) -> Box<dyn FastxReader> {
-	if file_path=="-" {
-		return parse_fastx_stdin().expect("Not valid stdin")
-	} else {
-		return parse_fastx_file(Path::new(file_path)).expect("Not valid input file while parse")
-	}	
-}
-
-fn count_n_base(bases:&Vec<char>, seq:Cow<[u8]>) -> i32{
-	let mut n_count = 0;
-
-	match str::from_utf8(&seq) {
-		// Ok(v) => n_count+=1,
-		Ok(v) => {
-			for char in v.chars(){
-				for base in bases{
-					if char == *base {
-						n_count += 1
-					}
+	while let Some(record) = reader.next() {
+        let seqrec = record.expect("invalid record");
+		let seq = seqrec.strip_returns();
+		// TODO
+		if num_base == 0 {
+			let n_count_specified = count_specified(&bases_u8, &seq, &mut_pos);
+			if n_count_specified <= specified_num_base{
+				seqrec.write(&mut writer, None).expect("write error");
+			}
+		} else {
+			let n_count = count_n_base(&bases_u8, &seq);
+			if n_count <= num_base{
+				let n_count_specified = count_specified(&bases_u8, &seq, &mut_pos);
+				if n_count_specified <= specified_num_base{
+					seqrec.write(&mut writer, None).expect("write error");
 				}
 			}
-		},
-		Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+		}
+    }
+}
+
+fn count_n_base(bases_u8:&Vec<u8>, seq:&Cow<[u8]>) -> u32{
+	let mut n_count:u32 = 0;
+	for char_u8 in seq.as_ref(){
+		for base_u8 in bases_u8{
+			if char_u8 == base_u8 {
+				n_count += 1
+			}
+		}
 	}
 	n_count
 }
 
-fn get_writer(out_file:&str) -> Box<dyn Write>{
-	let out_writer = match out_file {
-		"-" => Box::new(io::stdout()) as Box<dyn Write>,
-		_ => {
-			let path = Path::new(out_file);
-			Box::new(File::create(&path).unwrap()) as Box<dyn Write>
+fn count_specified(bases_u8:&Vec<u8>, seq:&Cow<[u8]>, mut_pos:&Vec<usize>) -> u32{
+	let mut n_count:u32 = 0;
+	for pos in mut_pos {
+		for base_u8 in bases_u8{
+			if seq.as_ref()[*pos] == *base_u8 {
+				n_count += 1
+			}
 		}
-	};
-	out_writer
+	}
+	n_count
 }
+
+
