@@ -6,3 +6,6 @@
 # /python
 .DS_Store
 benchmark.sh
+fasta_filter
+Cargo.lock
+tmp.txt

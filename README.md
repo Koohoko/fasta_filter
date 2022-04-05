@@ -4,7 +4,7 @@ This little tool accept a fasta file (or from stdin), and out put a filtered fas
 
 ### Usage:
 ```
-fasta_filter 0.1.1
+fasta_filter 0.1.2
 Haogao Gu <koohoko@gmail.com>
 A tool for filtering fasta sequences with threshold of specific bases (e.g. 'N'), written in Rust.
 
@@ -43,6 +43,15 @@ OPTIONS:
     -V, --version
             Print version information
 ```
+
+### Installation
+#### Executable
+Directly download executables from [Releases](https://github.com/Koohoko/fasta_filter/releases).
+#### Install from source
+1. Install Rust from [here](https://www.rust-lang.org/tools/install).
+2. Download source code by `git clone https://github.com/Koohoko/fasta_filter.git`.
+3. Install with `cargo install --path fasta_filter`.
+4. You are ready to go.
 
 ### Examples
 **Example input:**
@@ -109,46 +118,70 @@ Runing on plain fasta file containing SASR-CoV-2 sequences (it is 1.5GB in file 
 - For filter_fasta
 ```sh
 ✗ time -hl ./target/release/fasta_filter -f /Users/koohoko/Downloads/test.fasta -b N,- -n 4500 -m 10 -s ./data/BA1_BA2_pos.txt > /Users/koohoko/Downloads/benchmark_rust.fasta 2> ./data/benchmark_rust.log
-	5.33s real		4.18s user		1.06s sys
-             1363968  maximum resident set size
+	2.54s real		0.82s user		1.51s sys
+             1355776  maximum resident set size
                    0  average shared memory size
                    0  average unshared data size
                    0  average unshared stack size
-                 459  page reclaims
-                   0  page faults
+                 342  page reclaims
+                 115  page faults
                    0  swaps
                    0  block input operations
                    0  block output operations
                    0  messages sent
                    0  messages received
                    0  signals received
-                  59  voluntary context switches
-                2209  involuntary context switches
-         43564023536  instructions retired
-         18132780797  cycles elapsed
-              487424  peak memory footprint
+                  95  voluntary context switches
+                5699  involuntary context switches
+         12511630382  instructions retired
+          7453891336  cycles elapsed
+              512000  peak memory footprint
 ```
 - For a comparable [python implementation](./python/sequence_cleaner.py):
 ```sh
 ✗ time -hl python3 ./python/sequence_cleaner.py /Users/koohoko/Downloads/test.fasta 4500 ./data/BA1_BA2_pos.txt > /Users/koohoko/Downloads/benchmark_python.fasta 2> ./data/benchmark_python.log
-	11.85s real		10.65s user		1.30s sys
-            32690176  maximum resident set size
+	12.87s real		11.38s user		1.51s sys
+            32862208  maximum resident set size
                    0  average shared memory size
                    0  average unshared data size
                    0  average unshared stack size
-                8678  page reclaims
-                   6  page faults
+                6830  page reclaims
+                1909  page faults
                    0  swaps
                    0  block input operations
                    0  block output operations
                    0  messages sent
                    0  messages received
                    0  signals received
-                 478  voluntary context switches
-               47908  involuntary context switches
-         96607991082  instructions retired
-         40105094049  cycles elapsed
-            23801856  peak memory footprint
+                 788  voluntary context switches
+               36454  involuntary context switches
+        109115798178  instructions retired
+         44598463803  cycles elapsed
+            23973888  peak memory footprint
+```
+
+- Using filter_fasta with double filters for a big fasta file (302GB in plain text, multiple sequence alignment of SARS-CoV-2 downloaded from GISAID).
+```
+✗ time -hl ./target/release/fasta_filter -f /Volumes/SSD_480G/Downloads/msa_2022-04-04/2022-04-04_unmasked.fa -b n,- -n 4500 -m 10 -s ./data/BA1_BA2_pos.txt > /Users/koohoko/Downloads/2022-04-04_unmasked_filtered.fasta 2> /Users/koohoko/Downloads/2022-04-04_unmasked_filtered.log
+	11m6.78s real		4m15.83s user		5m28.02s sys
+             1466368  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+                 525  page reclaims
+                   0  page faults
+                   0  swaps
+                   0  block input operations
+                   6  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+               30227  voluntary context switches
+              869902  involuntary context switches
+       3564935360496  instructions retired
+       1860739256045  cycles elapsed
+              622592  peak memory footprint
+
 ```
 
 ### TODO / PLANS
@@ -156,7 +189,6 @@ Runing on plain fasta file containing SASR-CoV-2 sequences (it is 1.5GB in file 
 * [x] Test zip files. gz and xz inputs are also supported.
 * [x] Benchmark against python implementation.
 * [ ] Add installation instruction.
-* [ ] Improve performance.
 * [ ] Work in multithread mode?
 
 

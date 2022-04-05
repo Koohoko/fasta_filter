@@ -13,17 +13,6 @@ pub fn read_input(file_path:&str) -> Box<dyn FastxReader> {
 	reader
 }
 
-pub fn get_writer(out_file:&str) -> Box<dyn io::Write>{
-	let out_writer = match out_file {
-		"-" => Box::new(io::stdout()) as Box<dyn io::Write>,
-		_ => {
-			let path = Path::new(out_file);
-			Box::new(File::create(&path).unwrap()) as Box<dyn io::Write>
-		}
-	};
-	out_writer
-}
-
 pub fn read_specified_pos(specified_pos_file:&str) -> Vec<usize> {
 	let lines = read_lines(specified_pos_file).expect("Error when reading specified_pos_file");
 	let mut pos_vec=Vec::new();
