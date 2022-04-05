@@ -16,7 +16,7 @@ fn main() {
         )
         .arg(
             arg!(
-                -b --base <STRING> "Bases to be accounted for. Examples: \"N,-\" [Default: 'N']. Please note that everything other than \"AGCTN-\" is considered a N."
+                -b --base <STRING> "Bases to be accounted for. Examples: \"N,-\". Please note that this is case sensitive."
             )
             .required(false)
             .default_value("N")
@@ -45,7 +45,7 @@ fn main() {
         )
         .arg(
             arg!(
-                -o --out_file <NUMBER> "Path to write to the outfile, if \"-\" will write to stdout. [Default: -]"
+                -o --out_file <NUMBER> "Path to write to the outfile, if \"-\" will write to stdout."
             )
             .required(false)
             .default_value("-")
@@ -99,14 +99,14 @@ fn main() {
     bases.retain(|x| *x != ',');
     if check_verbose {eprintln!("bases: {:?}", bases)};
     
-    let mut num_base:u32 = 0;
+    let mut num_base:usize = 0;
     if let Some(num_base_input) = matches.value_of("num_base"){
         num_base = num_base_input.parse().expect("Please provide a integer.");
         if check_verbose {eprintln!("num_base: {}", num_base)}
     }
 
     let mut check_specified:bool = false;
-    let mut specified_num_base:u32 = 0;
+    let mut specified_num_base:usize = 0;
     let mut specified_pos_file:&str = "";
 
     if let Some(input_specified_pos_file) = matches.value_of("specified_pos_file"){

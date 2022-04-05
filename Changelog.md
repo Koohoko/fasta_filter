@@ -1,3 +1,6 @@
+v0.1.3:
+Improve performances for counting N bases, use bytecount. 
+
 v0.1.2:
 Improve IO performances, use BufWriter. 
 

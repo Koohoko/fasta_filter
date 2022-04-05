@@ -6,7 +6,7 @@ use std::path::Path;
 use std::fs::File;
 use crate::reader::{read_input, read_specified_pos};
 
-pub fn filter(file_path:&str, bases_u8:Vec<u8>, num_base:u32, out_file:&str) {
+pub fn filter(file_path:&str, bases_u8:Vec<u8>, num_base:usize, out_file:&str) {
 	let mut reader = read_input(file_path);
 	let stdout = io::stdout();
 	let mut writer: BufWriter<Box<dyn Write>> = match out_file {
@@ -19,7 +19,7 @@ pub fn filter(file_path:&str, bases_u8:Vec<u8>, num_base:u32, out_file:&str) {
         	BufWriter::new(Box::new(File::create(path).unwrap()))
 		},
 	};
-	// print!("{:?}", bases_u8);
+	
 	while let Some(record) = reader.next() {
         let seqrec = record.expect("invalid record");
 		let seq = seqrec.strip_returns();
@@ -35,7 +35,7 @@ pub fn filter(file_path:&str, bases_u8:Vec<u8>, num_base:u32, out_file:&str) {
     }
 }
 
-pub fn filter_specified(file_path:&str, bases_u8:Vec<u8>, num_base:u32, specified_pos_file:&str, specified_num_base:u32, out_file:&str) {
+pub fn filter_specified(file_path:&str, bases_u8:Vec<u8>, num_base:usize, specified_pos_file:&str, specified_num_base:usize, out_file:&str) {
 	let mut reader = read_input(file_path);
 	let stdout = io::stdout();
 	let mut writer: BufWriter<Box<dyn Write>> = match out_file {
@@ -64,10 +64,10 @@ pub fn filter_specified(file_path:&str, bases_u8:Vec<u8>, num_base:u32, specifie
 				writer.write_all(b"\n").unwrap();
 			}
 		} else {
-			let n_count = count_n_base(&bases_u8, &seq, &num_base);
-			if n_count <= num_base{
-				let n_count_specified = count_specified(&bases_u8, &seq, &mut_pos, &specified_num_base);
-				if n_count_specified <= specified_num_base{
+			let n_count_specified = count_specified(&bases_u8, &seq, &mut_pos, &specified_num_base);
+			if n_count_specified <= specified_num_base{
+				let n_count = count_n_base(&bases_u8, &seq, &num_base);
+				if n_count <= num_base{
 					writer.write_all(b">").unwrap();
 					writer.write_all(seqrec.id()).unwrap();
 					writer.write_all(b"\n").unwrap();
@@ -79,22 +79,18 @@ pub fn filter_specified(file_path:&str, bases_u8:Vec<u8>, num_base:u32, specifie
     }
 }
 
-fn count_n_base(bases_u8:&Vec<u8>, seq:&Cow<[u8]>, num_base:&u32) -> u32{
-	let mut n_count:u32 = 0;
+fn count_n_base(bases_u8:&Vec<u8>, seq:&Cow<[u8]>, num_base:&usize) -> usize{
+	let mut n_count:usize = 0;
 
 	for base_u8 in bases_u8{
-		for char_u8 in seq.as_ref(){
-			if char_u8 == base_u8 {
-				n_count += 1
-			}
-		}
+		n_count += bytecount::count(seq.as_ref(), *base_u8);
 		if n_count > *num_base {break;}
 	}
 	n_count
 }
 
-fn count_specified(bases_u8:&Vec<u8>, seq:&Cow<[u8]>, mut_pos:&Vec<usize>, specified_num_base:&u32) -> u32{
-	let mut n_count:u32 = 0;
+fn count_specified(bases_u8:&Vec<u8>, seq:&Cow<[u8]>, mut_pos:&Vec<usize>, specified_num_base:&usize) -> usize{
+	let mut n_count:usize = 0;
 	for base_u8 in bases_u8{
 		for pos in mut_pos {
 			if seq.as_ref()[*pos] == *base_u8 {
