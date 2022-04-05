@@ -10,3 +10,5 @@ fasta_filter
 Cargo.lock
 tmp.txt
 .cargo
+/data/debug.fasta
+# cargo_build.sh

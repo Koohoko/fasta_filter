@@ -23,8 +23,8 @@ pub fn filter(file_path:&str, bases_u8:Vec<u8>, num_base:usize, out_file:&str) {
 	while let Some(record) = reader.next() {
         let seqrec = record.expect("invalid record");
 		let seq = seqrec.strip_returns();
-		let n_count = count_n_base(&bases_u8, &seq, &num_base);
-
+		let n_count = count_n_base(&bases_u8, &seq, &num_base); //TODO: return a boolean will reduce one check in the next line
+		
 		if n_count <= num_base{
 			writer.write_all(b">").unwrap();
 			writer.write_all(seqrec.id()).unwrap();
@@ -81,7 +81,6 @@ pub fn filter_specified(file_path:&str, bases_u8:Vec<u8>, num_base:usize, specif
 
 fn count_n_base(bases_u8:&Vec<u8>, seq:&Cow<[u8]>, num_base:&usize) -> usize{
 	let mut n_count:usize = 0;
-
 	for base_u8 in bases_u8{
 		n_count += bytecount::count(seq.as_ref(), *base_u8);
 		if n_count > *num_base {break;}

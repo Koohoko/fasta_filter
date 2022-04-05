@@ -120,7 +120,7 @@ fn main() {
         check_specified = true
     }
 
-    let bases_u8:Vec<u8> = bases.into_iter().map(|c| c.to_ascii_uppercase()).map(|c| c as u8).collect();
+    let bases_u8:Vec<u8> = bases.into_iter().map(|c| c as u8).collect();
     if check_specified {
         if check_verbose {
             eprintln!("specified_pos_file: {}", specified_pos_file);

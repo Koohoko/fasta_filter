@@ -1,10 +1,10 @@
 ## fasta_filter
 
-This little tool accept a fasta file (or from stdin), and out put a filtered fasta file. It is (relatively) fast, see [comparison](#benchmark) between a simple python implementation.
+This little tool accept a fasta file (or from stdin), and out put a filtered fasta file (or to stdout). It is (relatively) fast, see [comparison](#benchmark) between a simple python implementation.
 
 ### Usage:
 ```
-fasta_filter 0.1.3
+fasta_filter 0.1.4
 Haogao Gu <koohoko@gmail.com>
 A tool for filtering fasta sequences with threshold of specific bases (e.g. 'N'), written in Rust.
 
@@ -113,36 +113,36 @@ TTTAAAAAAAAAAAAACCCCCCCCCCCTTTTTTTTGGGGGGGGGGGGGGGGAAACCC-----AAAAAANNNNNTTTTT
 ```
 
 ### Benchmark
-- Runing on plain fasta file containing SASR-CoV-2 sequences (it is 1.5GB in file size, and contains 50,000 sequences (length of each sequence ~ 29900)). fasta_filter used ~2s and the [python3](./python/sequence_cleaner.py) one used ~12s on my poor computer (Intel NUC8i5beh). Details can be found here ([Rust](./data/benchmark_rust.log), [Python]("./data/benchmark_python.log")).
+- Runing on plain fasta file containing SASR-CoV-2 sequences (it is 1.5GB in file size, and contains 50,000 sequences (length of each sequence ~ 29900)). When output to `/dev/null`, fasta_filter used ~0.6s and the [python3](./python/sequence_cleaner.py) one used ~12s on my poor computer (Intel NUC8i5beh). Details can be found here ([Rust](./data/benchmark_rust.log), [Python]("./data/benchmark_python.log")).
 
-- Using filter_fasta with double filters for a big fasta file (302GB in plain text, multiple sequence alignment of SARS-CoV-2 downloaded from GISAID). IO seems to be the bottleneck.
+- Using filter_fasta with double filters for a big fasta file (302GB in plain text, multiple sequence alignment of SARS-CoV-2 downloaded from GISAID). IO seems to be the major bottleneck.
 ```
-✗ time -hl ./target/release/fasta_filter -f /Volumes/SSD_480G/Downloads/msa_2022-04-04/2022-04-04_unmasked.fa -b n,- -n 3000 -m 10 -s ./data/BA1_BA2_pos.txt -o /Users/koohoko/Downloads/2022-04-04_unmasked_filtered.fasta 
-	10m14.25s real		2m47.21s user		4m53.15s sys
-             1507328  maximum resident set size
+✗ time -hl fasta_filter -f /Volumes/SSD_480G/Downloads/msa_2022-04-04/2022-04-04_unmasked.fa -b n,-,N -n 4500 -m 10 -s ./data/BA1_BA2_pos.txt -o /Users/koohoko/Downloads/2022-04-04_unmasked_filtered.fasta 
+	10m7.61s real		2m52.32s user		4m44.53s sys
+             1458176  maximum resident set size
                    0  average shared memory size
                    0  average unshared data size
                    0  average unshared stack size
-                 534  page reclaims
-                   0  page faults
+                 521  page reclaims
+                   1  page faults
                    0  swaps
                    0  block input operations
-                  10  block output operations
+                   7  block output operations
                    0  messages sent
                    0  messages received
                    0  signals received
-               26996  voluntary context switches
-             1138031  involuntary context switches
-       2356529992444  instructions retired
-       1433719284879  cycles elapsed
-              667648  peak memory footprint
+               27170  voluntary context switches
+             1002349  involuntary context switches
+       2358390178277  instructions retired
+       1400439339433  cycles elapsed
+              618496  peak memory footprint
 ```
 
 ### TODO / PLANS
 * [x] Test pipe streams. Stdin and Stdout work as expected.
 * [x] Test zip files. gz and xz inputs are also supported.
 * [x] Benchmark against python implementation.
-* [ ] Add installation instruction.
+* [x] Add installation instruction.
 * [ ] Work in multithread mode?
 
 
